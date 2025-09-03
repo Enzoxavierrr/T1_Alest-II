@@ -69,11 +69,14 @@ public class Main {
         long s2Max = Solucao2.simular(inst, Policy.MAX, false);
         long t4 = System.nanoTime();
 
+        System.out.println("=== Arquivo: " + file + " ===");
+        System.out.println("Processadores: " + inst.processors);
+
         System.out.printf("[Solução 1] MIN=%d (%.2f ms)  MAX=%d (%.2f ms)%n",
                 s1Min, (t1 - t0) / 1e6, s1Max, (t2 - t1) / 1e6);
+
         System.out.printf("[Solução 2] MIN=%d (%.2f ms)  MAX=%d (%.2f ms)%n",
                 s2Min, (t3 - t2) / 1e6, s2Max, (t4 - t3) / 1e6);
-
     }
 
     private static class Raw {
