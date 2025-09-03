@@ -3,20 +3,22 @@ import java.nio.file.*;
 import java.util.*;
 
 public class Main {
-    public enum Policy { MIN, MAX }
+    public enum Policy {
+        MIN, MAX
+    }
 
     public static class Instance {
         public final int processors;
-        public final Map<String,Integer> duration;           
-        public final Map<String,List<String>> adj;           
-        public final Map<String,Integer> indegree;           
-        public final List<String> allTasks;                  
+        public final Map<String, Integer> duration;
+        public final Map<String, List<String>> adj;
+        public final Map<String, Integer> indegree;
+        public final List<String> allTasks;
 
         public Instance(int processors,
-                        Map<String,Integer> duration,
-                        Map<String,List<String>> adj,
-                        Map<String,Integer> indegree,
-                        List<String> allTasks) {
+                Map<String, Integer> duration,
+                Map<String, List<String>> adj,
+                Map<String, Integer> indegree,
+                List<String> allTasks) {
             this.processors = processors;
             this.duration = duration;
             this.adj = adj;
@@ -33,8 +35,10 @@ public class Main {
         boolean trace = false;
         String file = null;
         for (String a : args) {
-            if (a.equalsIgnoreCase("--trace")) trace = true;
-            else file = a;
+            if (a.equalsIgnoreCase("--trace"))
+                trace = true;
+            else
+                file = a;
         }
         if (file == null) {
             System.out.println("Uso: java Main <arquivo.txt> [--trace]");
@@ -53,20 +57,23 @@ public class Main {
         }
 
         Instance inst = fromArray(processors, deps);
-        
 
-        long s1Min = Solucao1.simular(inst, Policy.MIN, trace);
-        long s1Max = Solucao1.simular(inst, Policy.MAX, trace);
-        long s2Min = Solucao2.simular(inst, Policy.MIN, trace);
-        long s2Max = Solucao2.simular(inst, Policy.MAX, trace);
-    
+        long t0 = System.nanoTime();
+        long s1Min = Solucao1.simular(inst, Policy.MIN, false);
+        long t1 = System.nanoTime();
+        long s1Max = Solucao1.simular(inst, Policy.MAX, false);
+        long t2 = System.nanoTime();
 
-        System.out.println("=== Arquivo: " + file + " ===");
-        System.out.println("Processadores: " + inst.processors);
-        System.out.println("[Solução 1 - Ingênua]  MIN: " + s1Min + "   MAX: " + s1Max);
-        System.out.println("[Solução 2 - Heaps  ]  MIN: " + s2Min + "   MAX: " + s2Max);
+        long s2Min = Solucao2.simular(inst, Policy.MIN, false);
+        long t3 = System.nanoTime();
+        long s2Max = Solucao2.simular(inst, Policy.MAX, false);
+        long t4 = System.nanoTime();
 
-        
+        System.out.printf("[Solução 1] MIN=%d (%.2f ms)  MAX=%d (%.2f ms)%n",
+                s1Min, (t1 - t0) / 1e6, s1Max, (t2 - t1) / 1e6);
+        System.out.printf("[Solução 2] MIN=%d (%.2f ms)  MAX=%d (%.2f ms)%n",
+                s2Min, (t3 - t2) / 1e6, s2Max, (t4 - t3) / 1e6);
+
     }
 
     private static class Raw {
@@ -81,7 +88,8 @@ public class Main {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.equals("digraph G {") || line.equals("}")) continue;
+                if (line.isEmpty() || line.equals("digraph G {") || line.equals("}"))
+                    continue;
 
                 if (line.startsWith("#")) {
                     // linha tipo "# Proc 9"
@@ -95,7 +103,7 @@ public class Main {
                         }
                     }
                 } else if (line.contains("->")) {
-                    deps.add(line.replace(";", "")); 
+                    deps.add(line.replace(";", ""));
                 }
             }
         }
@@ -104,34 +112,39 @@ public class Main {
     }
 
     public static Instance fromArray(int processors, String[] deps) {
-        Map<String,Integer> duration = new HashMap<>();
-        Map<String,List<String>> adj = new HashMap<>();
-        Map<String,Integer> indegree = new HashMap<>();
+        Map<String, Integer> duration = new HashMap<>();
+        Map<String, List<String>> adj = new HashMap<>();
+        Map<String, Integer> indegree = new HashMap<>();
 
         if (deps != null) {
             for (String dep : deps) {
-                if (dep == null) continue;
+                if (dep == null)
+                    continue;
                 String s = dep.trim();
-                if (s.isEmpty()) continue;
-                if (!s.contains("->")) continue;
+                if (s.isEmpty())
+                    continue;
+                if (!s.contains("->"))
+                    continue;
 
                 String[] parts = s.split("->");
-                if (parts.length != 2) continue;
+                if (parts.length != 2)
+                    continue;
 
                 String left = parts[0].trim();
                 String right = parts[1].trim();
-                if (!left.matches(".*_\\d+$") || !right.matches(".*_\\d+$")) continue;
+                if (!left.matches(".*_\\d+$") || !right.matches(".*_\\d+$"))
+                    continue;
 
                 int dl = parseDuration(left);
                 int dr = parseDuration(right);
 
-                duration.putIfAbsent(left,  dl);
+                duration.putIfAbsent(left, dl);
                 duration.putIfAbsent(right, dr);
 
-                adj.computeIfAbsent(left,  k -> new ArrayList<>()).add(right);
+                adj.computeIfAbsent(left, k -> new ArrayList<>()).add(right);
                 adj.putIfAbsent(right, new ArrayList<>());
 
-                indegree.putIfAbsent(left,  0);
+                indegree.putIfAbsent(left, 0);
                 indegree.put(right, indegree.getOrDefault(right, 0) + 1);
             }
         }
@@ -142,7 +155,7 @@ public class Main {
         }
 
         List<String> all = new ArrayList<>(duration.keySet());
-        Collections.sort(all); 
+        Collections.sort(all);
 
         return new Instance(processors, duration, adj, indegree, all);
     }
