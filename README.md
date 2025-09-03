@@ -20,5 +20,5 @@ Processadores: 9
 [Solução 1 - Ingênua]  MIN: 1234   MAX: 1370
 [Solução 2 - Heaps  ]  MIN: 1234   MAX: 1370
 
-
+Link relatório: https://docs.google.com/document/d/1k5SucNk8jDOnlRjOJn0_dxrSbxVeBAGQHYsuvB0olDk/edit?usp=sharing
     
