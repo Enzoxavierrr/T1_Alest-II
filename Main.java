@@ -62,6 +62,7 @@ public class Main {
                         break;
                     case 12:
                         System.out.println("Fechando programa");
+                        scanner.close();
                         System.exit(0);
                 }
             }
@@ -101,11 +102,9 @@ public class Main {
         }
     }
 
-
-     public enum Policy {
+    public enum Policy {
         MIN, MAX
     }
-
 
     private static class Raw {
         int processors;
